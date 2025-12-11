@@ -1,0 +1,120 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+
+<h2 class="mb-4">Dashboard Overview</h2>
+
+<!-- ===== TOP STATS ===== -->
+<div class="row g-3">
+
+    <div class="col-md-3">
+        <div class="admin-card stat-card">
+            <h6>Total Users</h6>
+            <h3 id="statUsers">{{ total_users }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="admin-card stat-card">
+            <h6>Flight Searches</h6>
+            <h3 id="statFlights">{{ total_flights }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="admin-card stat-card">
+            <h6>Weather Searches</h6>
+            <h3 id="statWeather">{{ total_weather }}</h3>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== MAIN CHARTS ===== -->
+<div class="row g-4 mt-3">
+
+    <div class="col-md-7">
+        <div class="admin-card">
+            <h6>Users Growth (Last 7 Days)</h6>
+            <canvas id="usersGrowthChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="admin-card">
+            <h6>Top Searched Destinations</h6>
+            <canvas id="topCitiesChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== USER ANALYTICS ===== -->
+<h3 class="mt-5 mb-3">User Analytics</h3>
+
+<div class="row g-4">
+
+    <div class="col-md-4">
+        <div class="admin-card">
+            <h6>Devices</h6>
+            <canvas id="deviceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="admin-card">
+            <h6>Browsers</h6>
+            <canvas id="browserChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="admin-card">
+            <h6>Top Countries</h6>
+            <canvas id="countryChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ========== 🔥 RECENT ACTIVITY TABLE ========== -->
+<h3 class="mt-5 mb-3">Recent Activity</h3>
+
+<div class="admin-card p-0">
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Browser</th>
+                <th>Device</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody id="recentActivityBody">
+            <tr><td colspan="6" class="text-center py-3">Loading...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Vector Map
+<link rel="stylesheet" href="https://unpkg.com/jsvectormap/dist/css/jsvectormap.min.css" />
+<script src="https://unpkg.com/jsvectormap"></script>
+<script src="https://unpkg.com/jsvectormap/dist/maps/world.js"></script> -->
+
+<!-- Main Admin JS -->
+<script src="{{ url_for('static', filename='js/admin_charts.js') }}"></script>
+
+{% endblock %}

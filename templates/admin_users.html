@@ -1,0 +1,51 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+
+<h2 class="mb-4">Users Management</h2>
+
+<div class="admin-card">
+
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Admin</th><th>Created</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.name }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.phone_number or '-' }}</td>
+            <td>
+                {% if u.is_admin %}
+                <span class="badge bg-success">Admin</span>
+                {% else %}
+                <span class="badge bg-secondary">User</span>
+                {% endif %}
+            </td>
+            <td>{{ u.created_at }}</td>
+            <td>
+                <!-- Edit -->
+                 <a href="/admin/users/edit/{{ u.id }}" class="btn btn-primary btn-sm">Edit</a>
+                 {% if not u.is_admin %}
+                 <a href="/admin/users/make-admin/{{ u.id }}" class="btn btn-success btn-sm">Make Admin</a>
+                 {% else %}
+                 <a href="/admin/users/remove-admin/{{ u.id }}" class="btn btn-warning btn-sm">Remove Admin</a>
+                 {% endif %}
+                 <a href="/admin/users/delete/{{ u.id }}" class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure? This cannot be undone.')">
+                    Delete
+                </a>
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+{% endblock %}

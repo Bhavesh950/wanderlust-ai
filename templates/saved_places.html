@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Saved places| Wanderlust AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-4">
+        <i class="bi bi-bookmark-heart-fill text-primary"></i>
+        Saved Places
+    </h2>
+
+    {% if trips %}
+        <div class="row g-4">
+
+            {% for t in trips %}
+            <div class="col-12 col-md-6 col-lg-4">
+
+                <div class="card saved-card shadow-sm border-0 rounded-4 h-100 overflow-hidden">
+
+                    <!-- Thumbnail -->
+                    <div class="saved-thumb"
+                        style="background-image:url('{{ t.img }}');">
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-4 d-flex flex-column">
+
+                        <h4 class="fw-semibold mb-1">{{ t.title }}</h4>
+                        <p class="text-secondary small mb-3">{{ t.sub }}</p>
+
+                        <div class="mt-auto d-flex gap-2">
+                            <a href="/destination/{{ t.title|lower }}" 
+                               class="btn btn-outline-primary w-100 fw-medium">
+                                View Itinerary
+                            </a>
+
+                            <button class="btn btn-danger remove-btn" 
+                                    data-id="{{ t.id }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="card-footer bg-transparent border-top small d-flex justify-content-between text-secondary">
+                        <span><i class="bi bi-calendar"></i> {{ t.created_at }}</span>
+                        <span><i class="bi bi-heart-fill text-danger"></i> Saved</span>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-bookmark-x text-secondary" style="font-size:60px;"></i>
+            <h4 class="fw-semibold mt-3">No Saved Trips Found</h4>
+            <p class="text-secondary">Your saved trips will appear here.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Styles -->
+<style>
+.saved-thumb {
+    width: 100%;
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+}
+.saved-card {
+    transition: 0.25s ease;
+}
+.saved-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 18px rgba(0,0,0,0.12);
+}
+.remove-btn {
+    width: 45px;
+}
+</style>
+
+<!-- JS for Delete -->
+<script>
+document.querySelectorAll(".remove-btn").forEach(btn => {
+    btn.addEventListener("click", async function () {
+
+        if (!confirm("Remove this saved trip?")) return;
+
+        const id = this.dataset.id;
+
+        const res = await fetch("/remove-saved", {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: new URLSearchParams({ id })
+        });
+
+        const result = await res.json();
+
+        if (result.status === "success") {
+            alert("Trip removed.");
+            location.reload();
+        } else {
+            alert("Error removing trip.");
+        }
+
+    });
+});
+</script>
+
+{% endblock %}

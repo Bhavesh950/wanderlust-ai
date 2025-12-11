@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Profile | Smart Travel Assistant{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+  <div class="row">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="col-lg-3">
+      <div class="card p-3 mb-3" style="border-radius:12px;">
+        <div class="text-center">
+
+          <!-- Avatar (CLICK → upload) -->
+          <div class="profile-pic-container position-relative mx-auto mb-2" style="width: 140px; height: 140px;">
+            <img id="profilePreview"
+                 src="{{ avatar }}"
+                 class="rounded-circle border"
+                 style="width: 140px; height: 140px; object-fit: cover;">
+
+            <!-- Edit Button -->
+            <label for="avatarInput" class="edit-icon"
+                style="
+                    position: absolute;
+                    bottom: 8px;
+                    right: 8px;
+                    background: white;
+                    border-radius: 50%;
+                    padding: 6px 8px;
+                    cursor: pointer;
+                    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+                ">
+              <i class="bi bi-pencil-fill" style="font-size: 14px; color: #333;"></i>
+            </label>
+          </div>
+
+          <h5 class="mt-2 mb-0">{{ user.get('name') or session.get('user_name') }}</h5>
+          <div class="text-secondary small">{{ user.get('email') or session.get('user_email') }}</div>
+
+        </div>
+
+        <hr>
+
+        <div class="list-group">
+          <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action active">Profile</a>
+          <a href="{{ url_for('settings') }}" class="list-group-item list-group-item-action">Settings</a>
+          <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">Log Out</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT FORM -->
+    <div class="col-lg-9">
+      <div class="card p-4" style="border-radius:12px;">
+        <h4 class="mb-4">Profile</h4>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+              <div class="alert alert-{{ 'success' if category=='success' else 'danger' }}">{{ msg }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- ✔ FORM STARTS HERE -->
+        <form method="post" enctype="multipart/form-data">
+
+          <!-- ✔ correct: avatar input must be inside the form -->
+          <input type="file" id="avatarInput" name="avatar" accept="image/*" class="d-none">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input name="first_name" class="form-control"
+                     value="{{ user.get('first_name') or (session.get('user_name') or '').split(' ')[0] }}">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input name="last_name" class="form-control"
+                     value="{{ user.get('last_name') or (session.get('user_name') or '').split(' ',1)[1] if (session.get('user_name') or '').split(' ',1)|length>1 else '' }}">
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Phone Country</label>
+              <input name="phone_country" class="form-control" value="{{ user.get('phone_country') or '+91' }}">
+            </div>
+
+            <div class="col-md-9">
+              <label class="form-label">Phone Number</label>
+              <input name="phone_number" class="form-control" value="{{ user.get('phone_number') or '' }}">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Email (cannot change)</label>
+              <input class="form-control" disabled
+                     value="{{ user.get('email') or session.get('user_email') }}">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="">Select</option>
+                <option value="Male" {% if user.get('gender')=='Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if user.get('gender')=='Female' %}selected{% endif %}>Female</option>
+                <option value="Other" {% if user.get('gender')=='Other' %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">About</label>
+              <textarea name="about" class="form-control" rows="4">{{ user.get('about') or '' }}</textarea>
+            </div>
+
+            <!-- <div class="col-12">
+              <label class="form-label">Profile Photo (optional)</label>
+              <div class="form-text">PNG / JPG / GIF — max 4MB</div>
+            </div> -->
+
+            <div class="col-12 text-end">
+              <button class="btn btn-primary">Update Profile</button>
+            </div>
+
+          </div>
+        </form>
+        <!-- ✔ FORM ENDS -->
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIVE PREVIEW JS -->
+<script>
+document.getElementById("avatarInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        document.getElementById("profilePreview").src = URL.createObjectURL(file);
+    }
+});
+</script>
+
+{% endblock %}

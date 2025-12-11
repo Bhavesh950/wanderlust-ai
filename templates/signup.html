@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Wanderlust AI{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-75 py-5">
+    <div class="card border-0 shadow-lg rounded-4 w-100" style="max-width: 450px;">
+        <div class="card-body p-5">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold mb-1">Create Account</h2>
+                <p class="text-secondary">Join Wanderlust AI today</p>
+            </div>
+
+            <!-- SHOW ERROR MESSAGE FROM BACKEND -->
+            {% if fail %}
+                <div class="alert alert-danger text-center">{{ fail }}</div>
+            {% endif %}
+
+            <!-- IMPORTANT FIXES: method, action, name attributes -->
+            <form method="POST" action="/signup">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-person"></i></span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="name" 
+                            name="name" 
+                            placeholder="John Doe" 
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-envelope"></i></span>
+                        <input 
+                            type="email" 
+                            class="form-control" 
+                            id="email" 
+                            name="email" 
+                            placeholder="you@example.com"
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-lock"></i></span>
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 text-white fw-medium py-2 mb-3">Sign Up</button>
+            </form>
+
+            <div class="text-center">
+                <p class="small text-secondary mb-0">Already have an account? 
+                    <a href="/login" class="fw-bold text-decoration-none">Sign in</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "admin_base.html" %}
+{% set active = "history" %}
+{% set title = "Search History" %}
+
+{% block content %}
+
+<h2 class="admin-title">Search History</h2>
+
+<!-- FLIGHT HISTORY -->
+<div class="admin-card mb-4">
+    <h5>Flight Searches</h5>
+
+    <form method="POST" action="/admin/history/clear/flights">
+        <button class="btn btn-danger btn-sm mb-2">Clear Flights</button>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for f in flight_history %}
+                <tr>
+                    <td>{{ f.id }}</td>
+                    <td>{{ f.name or 'Guest' }}</td>
+                    <td>{{ f.origin }}</td>
+                    <td>{{ f.destination }}</td>
+                    <td>{{ f.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+<!-- WEATHER HISTORY -->
+<div class="admin-card mb-4">
+    <h5>Weather Searches</h5>
+
+    <form method="POST" action="/admin/history/clear/weather">
+        <button class="btn btn-danger btn-sm mb-2">Clear Weather</button>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>City</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for w in weather_history %}
+                <tr>
+                    <td>{{ w.id }}</td>
+                    <td>{{ w.name or 'Guest' }}</td>
+                    <td>{{ w.city }}</td>
+                    <td>{{ w.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+<!-- MAP LOGS -->
+<div class="admin-card mb-4">
+    <h5>Map Searches</h5>
+
+    <form method="POST" action="/admin/history/clear/maps">
+        <button class="btn btn-danger btn-sm mb-2">Clear Map Logs</button>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Location</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for m in map_history %}
+                <tr>
+                    <td>{{ m.id }}</td>
+                    <td>{{ m.name or 'Guest' }}</td>
+                    <td>{{ m.location }}</td>
+                    <td>{{ m.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{{ hotel or "Hotel Details" }}{% endblock %}
+
+{% block content %}
+<style>
+.image-slider { height: 420px; overflow: hidden; border-radius: 16px; }
+.image-slider img { object-fit: cover; width: 100%; height: 100%; }
+.amenity-box { background: rgba(255,255,255,0.08); padding: 14px 18px; border-radius: 14px; display: flex; align-items: center; gap: 10px; }
+.review-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.07); }
+.sticky-price { position: sticky; top: 85px; }
+
+/* Card styling + hover */
+.review-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.review-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+/* Light Mode – light gray card */
+body:not(.dark-mode) .review-card {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Dark Mode – darker blue-gray card */
+body.dark-mode .review-card {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+
+
+</style>
+
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-1">{{ hotel_name}}</h2>
+    <p class="text-secondary"><i class="bi bi-geo-alt"></i> {{ hotel.address or "Address unavailable" }}</p>
+
+    <!-- HOTEL IMAGE SLIDER -->
+     <div id="hotelCarousel" class="carousel slide shadow-lg rounded mb-4"
+          data-bs-ride="carousel" data-bs-interval="3000">
+          <!-- Indicators -->
+           <div class="carousel-indicators">
+                {% for img in photos %}
+                <button type="button"
+                        data-bs-target="#hotelCarousel"
+                        data-bs-slide-to="{{ loop.index0 }}"
+                        class="{% if loop.first %}active{% endif %}">
+                </button>
+                {% endfor %}
+            </div>
+            
+            <!-- Images -->
+             <div class="carousel-inner" style="height: 480px; border-radius: 12px;">
+                {% for img in photos %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <img src="{{ img }}" class="d-block w-100"
+                    style="object-fit: cover; height:100%;" />
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Arrows -->
+             <button class="carousel-control-prev" type="button"
+                    data-bs-target="#hotelCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+            </button>
+            
+            <button class="carousel-control-next" type="button"
+                    data-bs-target="#hotelCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+            </button>
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <h4 class="fw-bold mt-4 mb-3">Guest Reviews</h4>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% if reviews %}
+                {% for r in reviews %}
+                <div class="col">
+                    <div class="review-card shadow-sm p-3 rounded h-100">
+                        
+                        <!-- REMOVE text-white -->
+                         <h6 class="fw-bold review-author">{{ r.author or "Guest" }}</h6>
+                            <!-- REMOVE text-secondary -->
+                             <p class="review-text mb-2" style="min-height: 48px;">
+                                {{ r.pros or r.review_text or "No comments available." }}
+                            </p>
+                            <span class="badge bg-success px-3 py-2">
+                                ⭐ {{ r.score or r.review_score or "N/A" }}
+                            </span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-secondary">No reviews available.</p>
+                {% endif %}
+            </div>
+
+
+
+            <h4 class="fw-bold mt-4">About this property</h4>
+            <p class="text-secondary">{{ hotel.description or description }}</p>
+
+            <h4 class="fw-bold mt-4 mb-3">Amenities</h4>
+            <div class="row g-3">
+                {% if amenities %}
+                    {% for a in amenities %}
+                    <div class="col-md-4">
+                        <div class="amenity-box">
+                            <i class="bi bi-check-circle text-primary"></i>
+                            <span>{{ a or "Amenity" }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-secondary">No amenities listed.</p>
+                {% endif %}
+            </div>
+
+            {% if hotel.latitude %}
+            <h4 class="fw-bold mt-5">Location</h4>
+            <div class="rounded-4 overflow-hidden shadow-lg mb-3">
+                <iframe width="100%" height="300"
+                src="https://www.google.com/maps?q={{ hotel.latitude }},{{ hotel.longitude }}&output=embed"
+                style="border:0" loading="lazy" allowfullscreen>
+            </iframe>
+        </div>
+        <p class="text-secondary">Near: {{ hotel.address }}</p>
+        {% else %}
+        <h4 class="fw-bold mt-5">Location (Approx.)</h4>
+        <div class="rounded-4 overflow-hidden shadow-lg mb-3">
+            <iframe width="100%" height="300"
+            src="https://www.google.com/maps?q={{ city_name or hotel.address }}&output=embed"
+            style="border:0" loading="lazy" allowfullscreen>
+        </iframe>
+    </div>
+    <p class="text-secondary">Exact location unavailable — showing city map.</p>
+    {% endif %}
+
+
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-price">
+                <div class="card border-0 shadow-lg p-4 rounded-4">
+
+                    <h3 class="fw-bold text-primary mb-1">
+                        ₹{{ price or "N/A" }}
+                    </h3>
+                    <p class="text-secondary small mb-3">Total price (approx.)</p>
+
+                    <hr>
+
+                    <a href="{{ hotel.url or '#' }}" target="_blank"
+                       class="btn btn-primary w-100 py-3 fs-5 fw-semibold rounded-4">
+                        Book Now
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

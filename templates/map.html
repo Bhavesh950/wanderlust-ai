@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}Map - Wanderlust AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <div class="card shadow-lg border-0 rounded-4 p-4 mb-4">
+        <h4 class="fw-bold mb-3"><i class="bi bi-map text-primary"></i> Search a Place</h4>
+
+        <form method="POST" class="row g-3">
+            <div class="col-md-8 position-relative">
+                <input type="text" id="placeInput" name="place" class="form-control"
+                       placeholder="Search places..." autocomplete="off" required>
+
+                <!-- Autocomplete -->
+                <ul id="suggestions"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1000;"></ul>
+            </div>
+
+            <div class="col-md-4">
+                <button class="btn btn-primary w-100">Show Map</button>
+            </div>
+        </form>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+
+    {% if details %}
+    <div class="mb-3">
+        <h4 class="fw-bold">{{ details.name }}</h4>
+        <p class="text-secondary">
+            <i class="bi bi-geo-alt"></i>
+            Lat: {{ details.lat }} | Lon: {{ details.lon }}
+        </p>
+
+        <!-- Theme buttons + distance + save -->
+        <div class="d-flex gap-2 my-3">
+            <button class="btn btn-secondary" onclick="setTheme('light')">🌞 Light</button>
+            <button class="btn btn-secondary" onclick="setTheme('dark')">🌙 Dark</button>
+            <button class="btn btn-secondary" onclick="setTheme('sat')">🛰 Satellite</button>
+            <button class="btn btn-success" onclick="getUserLocation()">📍 My Location</button>
+        </div>
+
+        <div><b>Distance:</b> <span id="distanceBox">—</span></div>
+        <button class="btn btn-primary mt-2" onclick="savePlace()">💾 Save This Place</button>
+        <div class="text-success mt-1" id="saveMsg" style="display:none;">Saved!</div>
+
+    </div>
+
+    <!-- MAP -->
+    <div id="leafletMap" style="height: 500px; border-radius: 12px;"></div>
+    {% endif %}
+
+</div>
+
+
+<!-- =========================== -->
+<!-- LEAFLET JS + FEATURES -->
+<!-- =========================== -->
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+// ================= AUTOCOMPLETE =================
+let input = document.getElementById("placeInput");
+let suggestions = document.getElementById("suggestions");
+
+input.addEventListener("input", function() {
+    let text = input.value.trim();
+    if (text.length < 2) {
+        suggestions.innerHTML = "";
+        return;
+    }
+
+    fetch(`https://nominatim.openstreetmap.org/search?q=${text}&format=json&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+            suggestions.innerHTML = "";
+            data.forEach(place => {
+                let item = document.createElement("li");
+                item.classList.add("list-group-item");
+                item.style.cursor = "pointer";
+                item.innerText = place.display_name;
+
+                item.onclick = () => {
+                    input.value = place.display_name;
+                    suggestions.innerHTML = "";
+                };
+
+                suggestions.appendChild(item);
+            });
+        });
+});
+
+// ================= LEAFLET MAP =================
+{% if details %}
+
+// Base map
+var map = L.map('leafletMap').setView([{{ details.lat }}, {{ details.lon }}], 14);
+
+// Themes
+var layers = {
+    light: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),
+    dark: L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"),
+    sat: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}")
+};
+
+layers.light.addTo(map);
+
+// Main marker
+var mainMarker = L.marker([{{ details.lat }}, {{ details.lon }}]).addTo(map);
+
+// Click-to-add second marker
+var secondMarker = null;
+var routeLine = null;
+
+map.on("click", function(e) {
+    if (secondMarker) map.removeLayer(secondMarker);
+    secondMarker = L.marker(e.latlng).addTo(map);
+
+    drawRoute(
+        [{{ details.lat }}, {{ details.lon }}],
+        [e.latlng.lat, e.latlng.lng]
+    );
+});
+
+// Draw route
+function drawRoute(p1, p2) {
+    if (routeLine) map.removeLayer(routeLine);
+
+    routeLine = L.polyline([p1, p2], {color: "yellow"}).addTo(map);
+
+    let dist = calcDistance(p1[0], p1[1], p2[0], p2[1]);
+    document.getElementById("distanceBox").innerText = dist + " km";
+}
+
+// Distance (Haversine)
+function calcDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    let dLat = (lat2 - lat1) * Math.PI / 180;
+    let dLon = (lon2 - lon1) * Math.PI / 180;
+
+    let a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180) *
+            Math.cos(lat2*Math.PI/180) *
+            Math.sin(dLon/2)**2;
+
+    return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(2);
+}
+
+// GPS
+function getUserLocation() {
+    navigator.geolocation.getCurrentPosition(pos => {
+        let lat = pos.coords.latitude;
+        let lon = pos.coords.longitude;
+
+        L.marker([lat, lon]).addTo(map);
+        map.setView([lat, lon], 14);
+    });
+}
+
+// Theme switcher
+function setTheme(type) {
+    map.eachLayer(x => map.removeLayer(x));
+    layers[type].addTo(map);
+
+    mainMarker.addTo(map);
+    if (secondMarker) secondMarker.addTo(map);
+    if (routeLine) routeLine.addTo(map);
+}
+
+// Save Place (LocalStorage)
+function savePlace() {
+    let saved = JSON.parse(localStorage.getItem("saved_places") || "[]");
+
+    saved.push({
+        name: "{{ details.name }}",
+        address: "{{ details.address }}",
+        lat: {{ details.lat }},
+        lon: {{ details.lon }}
+    });
+
+    localStorage.setItem("saved_places", JSON.stringify(saved));
+
+    document.getElementById("saveMsg").style.display = "block";
+    setTimeout(() => {
+        document.getElementById("saveMsg").style.display = "none";
+    }, 1500);
+}
+
+{% endif %}
+</script>
+
+{% endblock %}

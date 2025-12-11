@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width:480px;margin:60px auto;">
+  <div class="card p-4">
+    <h3 class="mb-3">Admin Login</h3>
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+      <label>Email</label>
+      <input class="form-control mb-2" name="email" value="{{ request.form.email or '' }}" required>
+      <label>Passwords</label>
+      <input class="form-control mb-3" name="password" type="password" required>
+      <button class="btn btn-primary w-100">Login</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Trending Destinations{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="fw-bold text-center mb-4">Find Your Perfect Destination</h1>
+    <p class="text-center text-secondary mb-5">Choose the type of place you want to travel.</p>
+
+    <!-- CATEGORY BUTTONS -->
+    <div class="row g-3 mb-5">
+
+        {% set categories = [
+            {"name":"Beaches","icon":"bi-water","tag":"beach"},
+            {"name":"Mountains","icon":"bi-triangle","tag":"mountain"},
+            {"name":"Historical","icon":"bi-bank","tag":"historical"},
+            {"name":"City Life","icon":"bi-building","tag":"city"},
+            {"name":"Nature","icon":"bi-tree","tag":"nature"},
+            {"name":"Snow","icon":"bi-snow","tag":"snow"}
+        ] %}
+
+        {% for c in categories %}
+        <div class="col-md-4">
+            <a href="/trending/{{ c.tag }}" class= "category-btn w-100 py-3 rounded-4 fs-5">
+                <i class="bi {{ c.icon }} me-2"></i> {{ c.name }}
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- DESTINATIONS LIST (Dynamic) -->
+    {% if destinations %}
+    <h2 class="fw-bold mb-4 text-center">{{ category_name }} Destinations</h2>
+    <div class="row g-4 mt-4">
+        
+        {% for d in destinations %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/destination/{{ d.place | lower }}" class="text-decoration-none">
+                <div class="trend-card shadow-sm">
+                    <img src="{{ d.img }}" class="trend-img" alt="{{ d.place }}">
+                    <div class="trend-body">
+                        <h5 class="trend-title">{{ d.place }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+</div>
+
+<style>
+.hover-card {transition: transform .3s ease;}
+.hover-card:hover {transform: translateY(-8px);}
+
+.trend-card {
+    background: #111c2e;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s ease;
+}
+
+.trend-card:hover {
+    transform: scale(1.04);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.trend-img {
+    height: 160px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.trend-body {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.trend-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+<!-- .trend-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+} -->
+
+/* theme fix */
+:root[data-bs-theme="light"] .trend-title {
+    color: #0a0a0a !important;
+}
+
+:root[data-bs-theme="dark"] .trend-title {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

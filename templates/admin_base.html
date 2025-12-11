@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+/* =========================
+BASE COLOR VARIABLES
+========================= */
+:root[data-bs-theme="light"] {
+    --admin-bg: #f2f4f7;
+    --admin-card: rgba(255,255,255,0.65);
+    --admin-text: #1a1a1a;
+    --admin-sidebar: #101e33;
+    --admin-sidebar-text: #cdd3dd;
+    --admin-border: #e0e0e0;
+}
+
+:root[data-bs-theme="dark"] {
+    --admin-bg: #0d1b2a;
+    --admin-card: rgba(255,255,255,0.06);
+    --admin-text: #ffffff;
+    --admin-sidebar: #0a1524;
+    --admin-sidebar-text: #b8c6d9;
+    --admin-border: #253449;
+}
+
+/* =========================
+PAGE STYLE
+========================= */
+body {
+    background-color: var(--admin-bg) !important;
+    color: var(--admin-text) !important;
+    transition: 0.25s ease-in-out;
+}
+
+/* =========================
+ADMIN LAYOUT
+========================= */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--admin-bg);
+}
+
+/* =========================
+SIDEBAR (NO COLLAPSE)
+========================= */
+.admin-sidebar {
+    width: 240px;
+    background: var(--admin-sidebar);
+    padding: 20px;
+    color: var(--admin-sidebar-text);
+    transition: width 0.25s ease;
+    position: relative;
+}
+
+.admin-sidebar h3 {
+    margin-bottom: 20px;
+}
+
+.admin-sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--admin-sidebar-text);
+    text-decoration: none;
+    margin-bottom: 8px;
+    transition: 0.2s;
+}
+
+.admin-sidebar a.active,
+.admin-sidebar a:hover {
+    background: rgba(255,255,255,0.12);
+    color: white;
+}
+
+/* =========================
+RIGHT CONTENT AREA
+========================= */
+.admin-content {
+    flex-grow: 1;
+    padding: 25px;
+}
+
+/* =========================
+PREMIUM GLASS CARDS
+========================= */
+.admin-card {
+    backdrop-filter: blur(18px);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+    transition: 0.25s ease;
+}
+
+:root[data-bs-theme="light"] .admin-card {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid #ddd;
+}
+
+.admin-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* =========================
+THEME TOGGLE BUTTON
+========================= */
+.theme-toggle-btn {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    background: transparent;
+    border: none;
+    color: var(--admin-text);
+}
+
+</style>
+
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR (NO TOGGLE) -->
+    <div class="admin-sidebar">
+
+        <h3>Admin Panel</h3>
+
+        <a href="/admin" class="{% if request.path == '/admin' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        </a>
+
+        <a href="/admin/users" class="{% if '/admin/users' in request.path %}active{% endif %}">
+            <i class="bi bi-people"></i> <span>Users</span>
+        </a>
+
+        <a href="/admin/logs" class="{% if '/admin/logs' in request.path %}active{% endif %}">
+            <i class="bi bi-clipboard-data"></i> <span>Logs</span>
+        </a>
+
+        <a href="/admin/settings" class="{% if '/admin/settings' in request.path %}active{% endif %}">
+            <i class="bi bi-gear"></i> <span>Settings</span>
+        </a>
+
+        <a href="/logout" style="color:#ff7675;">
+            <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+        </a>
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div class="admin-content">
+
+        <!-- THEME TOGGLE -->
+        <button id="adminThemeToggle" class="theme-toggle-btn">
+            <i class="bi bi-brightness-high"></i>
+        </button>
+
+        {% block admin_content %}{% endblock %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block extra_scripts %}
+
+<!-- THEME TOGGLE -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const html = document.documentElement;
+    const btn = document.getElementById("adminThemeToggle");
+
+    const saved = localStorage.getItem("theme");
+    if (saved) html.setAttribute("data-bs-theme", saved);
+
+    btn.addEventListener("click", () => {
+        const current = html.getAttribute("data-bs-theme") || "light";
+        const next = current === "light" ? "dark" : "light";
+        html.setAttribute("data-bs-theme", next);
+        localStorage.setItem("theme", next);
+    });
+});
+</script>
+
+{% endblock %}

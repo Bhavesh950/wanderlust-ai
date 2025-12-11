@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% block title %}Euri – Your Travel AI Assistant{% endblock %}
+
+{% block content %}
+
+<style>
+
+.chat-history-item {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-menu-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: none;
+}
+
+.chat-history-item:hover .chat-menu-btn {
+    display: block;
+}
+
+.chat-menu {
+    position: absolute;
+    right: 5px;
+    top: 35px;
+    background: #1f2a3d;
+    border: 1px solid #2b3a4f;
+    border-radius: 5px;
+    display: none;
+    flex-direction: column;
+    width: 120px;
+    z-index: 999;
+}
+
+.chat-menu div {
+    padding: 8px;
+    cursor: pointer;
+    color: white;
+}
+
+.chat-menu div:hover {
+    background: #2f4b77;
+}
+
+
+/* ========== PAGE LAYOUT ========== */
+#chat-wrapper {
+    display: flex;
+    height: 80vh;
+    max-width: 1300px;
+    margin: 25px auto;
+}
+
+/* ========== SIDEBAR ========== */
+#sidebar {
+    width: 260px;
+    background: #0f1a2b;
+    border-right: 1px solid #1f2a3d;
+    padding: 15px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+#new-chat-btn {
+    background: #2b90ff;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+#search-chats {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 15px;
+}
+
+#history-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.chat-history-item {
+    padding: 10px;
+    background: #182538;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.chat-history-item:hover {
+    background: #223449;
+}
+
+/* ========== CHAT AREA ========== */
+#chat-area {
+    flex: 1;
+    padding: 25px;
+}
+
+/* FIX: Chat messages scrolling + prevent going under footer */
+#messages {
+    height: calc(80vh - 160px);   /* visible height before footer */
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
+#chat-input-box {
+    padding-bottom: 10px;
+}
+
+.message {
+    padding: 12px 18px;
+    border-radius: 14px;
+    margin: 12px 0;
+    font-size: 16px;
+    max-width: 65%;
+}
+
+/* BOT LEFT */
+.bot {
+    background: #f3c8ff;
+    color: #333;
+    margin-right: auto;
+}
+
+/* USER RIGHT */
+.user {
+    background: #9bbcff;
+    color: #000;
+    margin-left: auto;
+    text-align: left;
+}
+
+/* INPUT AREA */
+#chat-input-box {
+    display: flex;
+    margin-top: 20px;
+}
+#ai-input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #666;
+}
+#ai-send {
+    background: #2b90ff;
+    border: none;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+</style>
+
+<div id="chat-wrapper">
+
+    <!-- ========== SIDEBAR ========== -->
+    <div id="sidebar">
+        <button id="new-chat-btn">+ New Chat</button>
+        <input type="text" id="search-chats" placeholder="Search chats...">
+
+        <div id="history-list">
+            <!-- Chat titles will appear here -->
+        </div>
+    </div>
+
+    <!-- ========== MAIN CHAT AREA ========== -->
+    <div id="chat-area">
+        <h2 class="fw-bold">Meet Euri – Your Smart Travel Companion</h2>
+        <p class="text-secondary">Ask Euri about destinations, hotels, flights, itineraries, and more.</p>
+
+        <div id="messages"></div>
+
+        <div id="chat-input-box">
+            <input id="ai-input" type="text" placeholder="Ask me anything about your trip…">
+            <button id="ai-send">Ask</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* ================================
+   ELEMENTS
+============================= */
+const messagesBox = document.getElementById("messages");
+const input = document.getElementById("ai-input");
+const sendBtn = document.getElementById("ai-send");
+const historyList = document.getElementById("history-list");
+const newChatBtn = document.getElementById("new-chat-btn");
+
+let currentChatId = null; // active conversation id
+
+
+/* ================================
+   AUTO CREATE CHAT ON PAGE LOAD
+============================= */
+function autoCreateChat() {
+    fetch("/api/start_chat", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+
+            console.log("Auto-chat ID:", data.conversation_id);
+            currentChatId = data.conversation_id;
+
+            // Clear messages
+            messagesBox.innerHTML = "";
+
+            // First greeting from Euri
+            addMessage("Hello! I'm Euri, your travel assistant. How can I help you today?", "bot");
+
+            // Refresh chat list (small delay so backend saves first)
+            setTimeout(() => {
+                loadChatList();
+            }, 150);
+
+        });
+}
+
+
+/* ================================
+   LOAD CHAT LIST
+============================= */
+function loadChatList() {
+    fetch("/api/chats")
+        .then(res => res.json())
+        .then(chats => {
+            historyList.innerHTML = "";
+
+            if (chats.length === 0) {
+                historyList.innerHTML = `<p style="color:#aaa;">No chats yet</p>`;
+                return;
+            }
+
+            chats.forEach(chat => {
+                let item = document.createElement("div");
+                item.className = "chat-history-item";
+                
+                item.innerHTML = `
+                <span class="chat-title">${chat.title || "New Chat"}</span>
+                <button class="chat-menu-btn">⋮</button>
+                
+                <div class="chat-menu">
+                    <div class="rename-chat">Rename</div>
+                    <div class="delete-chat">Delete</div>
+                </div>
+                `;
+                
+                // OPEN CHAT ON CLICK
+                item.onclick = () => openChat(chat.id);
+                
+                // MENU BUTTON CLICK
+                item.querySelector(".chat-menu-btn").onclick = (e) => {
+                    e.stopPropagation();
+                    let menu = item.querySelector(".chat-menu");
+                    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+                };
+                
+                // RENAME CHAT
+                item.querySelector(".rename-chat").onclick = (e) => {
+                    e.stopPropagation();
+                    let newName = prompt("Enter new chat name:");
+                    if (!newName) return;
+                    fetch(`/api/chat/${chat.id}/rename`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ title: newName })
+                    }).then(() => loadChatList());
+                };
+                // DELETE CHAT
+                item.querySelector(".delete-chat").onclick = (e) => {
+                    e.stopPropagation();
+                    if (!confirm("Delete this chat?")) return;
+                    fetch(`/api/chat/${chat.id}/delete`, {
+                        method: "DELETE"
+                    
+                    }).then(() => {
+                        
+                        if (currentChatId === chat.id) {
+                            
+                            currentChatId = null;
+                            messagesBox.innerHTML = "";
+                        }
+                        
+                        loadChatList();
+                    
+                    });
+                };
+                historyList.appendChild(item);
+            });
+        });
+}
+
+
+/* ================================
+   OPEN A CHAT
+============================= */
+function openChat(chat_id) {
+    currentChatId = chat_id;
+
+    fetch(`/api/chat/${chat_id}`)
+        .then(res => res.json())
+        .then(messages => {
+            messagesBox.innerHTML = "";
+
+            messages.forEach(msg => {
+                addMessage(msg.text, msg.sender);
+            });
+        });
+}
+
+
+/* ================================
+   NEW CHAT BUTTON
+============================= */
+newChatBtn.onclick = () => {
+    fetch("/api/new_chat", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            currentChatId = data.conversation_id;
+
+            messagesBox.innerHTML = "";
+            addMessage("Hello! I'm Euri, your travel assistant. How can I help you today?", "bot");
+
+            loadChatList();
+        });
+};
+
+
+/* ================================
+   SEND MESSAGE
+============================= */
+function sendAI() {
+    let text = input.value.trim();
+    if (!text) return;
+
+    // If no chat exists → AUTOMATICALLY CREATE ONE
+    if (!currentChatId) {
+        return autoCreateChatThenSend(text);
+    }
+
+    sendMessageToAI(text);
+}
+
+
+// Helper: Create chat first, then send
+function autoCreateChatThenSend(text) {
+    fetch("/api/start_chat", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            currentChatId = data.conversation_id;
+
+            messagesBox.innerHTML = "";
+            addMessage("Hello! I'm Euri, your travel assistant. How can I help you today?", "bot");
+
+            loadChatList();
+
+            sendMessageToAI(text);
+        });
+}
+
+
+// Actual message sending
+function sendMessageToAI(text) {
+    addMessage(text, "user");
+    input.value = "";
+
+    fetch("/api/assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            message: text,
+            conversation_id: currentChatId
+        })
+    })
+        .then(res => res.json())
+        .then(data => {
+            addMessage(data.reply, "bot");
+            loadChatList();
+        });
+}
+
+
+/* ================================
+   ADD MESSAGE
+============================= */
+function addMessage(text, sender) {
+    let div = document.createElement("div");
+    div.classList.add("message", sender);
+    div.textContent = text;
+
+    messagesBox.appendChild(div);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+}
+
+
+/* ================================
+   PAGE LOAD → AUTO CREATE CHAT
+============================= */
+window.addEventListener("load", loadChatList);
+window.addEventListener("load", () => {
+    // Show greeting but DO NOT create chat
+    messagesBox.innerHTML = "";
+    addMessage("Hello! I'm Euri, your travel assistant. How can I help you today?", "bot");
+});
+sendBtn.onclick = sendAI;
+
+input.addEventListener("keypress", e => {
+    if (e.key === "Enter") sendAI();
+});
+
+
+
+</script>
+
+{% endblock %}

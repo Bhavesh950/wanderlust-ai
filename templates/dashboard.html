@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Smart Travel Assistant{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper d-flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-top text-center p-4">
+            <img src="{{ profile_pic }}" alt="avatar" class="avatar-large mb-2">
+            <!-- <div>
+                <div class="fw-semibold small">Hello,</div>
+                <div class="fw-bold">{{ user_name }}</div>
+            </div> -->
+        </div>
+
+        <nav class="nav flex-column px-2 pb-4">
+            <a class="nav-link active" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+            <a class="nav-link" href="/flights"><i class="bi bi-airplane me-2"></i>Flights</a>
+            <a class="nav-link" href="/hotels"><i class="bi bi-building me-2"></i>Hotels</a>
+            <a class="nav-link" href="/weather"><i class="bi bi-cloud-sun me-2"></i>Weather</a>
+            <a class="nav-link" href="/map"><i class="bi bi-map me-2"></i>Map</a>
+            <a class="nav-link" href="/my-trips"><i class="bi bi-briefcase me-2"></i>My Trips</a>
+            <a class="nav-link" href="/saved-trips"><i class="bi bi-bookmark me-2"></i>Saved Places</a>
+            <a class="nav-link mt-3 text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+        </nav>
+
+        <div class="sidebar-footer p-3 small text-secondary">
+            <div>Explorer Profile:<strong>Active</strong></div>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main-content flex-grow-1 p-4">
+        <!-- Top row: toggle & welcome -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <button id="sidebarToggle" class="btn btn-light btn-sm d-lg-none">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h2 class="mb-0">Welcome back, <span class="text-primary">{{ user_name }}</span></h2>
+            </div>
+
+            <div class="d-flex gap-2 align-items-center">
+                <div class="small text-secondary me-3 d-none d-md-block">Quick actions</div>
+                <a href="/flights" class="btn btn-outline-primary btn-sm">Plan Flight</a>
+                <a href="/hotels" class="btn btn-primary btn-sm text-white">Find Hotels</a>
+            </div>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-md-3">
+                <div class="stat-card p-3">
+                    <div class="stat-icon"><i class="bi bi-calendar2-check"></i></div>
+                    <div class="stat-title small text-secondary">Trips Planned</div>
+                    <div class="stat-value h4">{{ stats.trips_planned }}</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-3">
+                <div class="stat-card p-3">
+                    <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
+                    <div class="stat-title small text-secondary">Destinations Saved</div>
+                    <div class="stat-value h4">{{ stats.destinations_saved }}</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-3">
+                <div class="stat-card p-3">
+                    <div class="stat-icon"><i class="bi bi-airplane"></i></div>
+                    <div class="stat-title small text-secondary">Flights Checked</div>
+                    <div class="stat-value h4">{{ stats.flights_checked }}</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-3"> 
+                <div class="stat-card p-3">
+                    <div class="stat-icon"><i class="bi bi-heart"></i></div>
+                    <div class="stat-title small text-secondary">Favorites</div>
+                    <div class="stat-value h4">{{ stats.favorites }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0">Trending Destinations</h5>
+            
+            <!-- View All Button -->
+             
+            <a href="/trending" class="text-primary small fw-bold" style="text-decoration:none;">
+                View all →
+            </a>
+        </div>
+
+        <div class="row g-4 mb-4">
+            
+            {% for d in trending %}
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden position-relative dashboard-trending-card">
+                    
+                    <!-- Image -->
+                     
+                    <img src="{{ d.image }}" class="card-img-top" alt="{{ d.name }}">
+                    
+                    <!-- Rating badge -->
+                     
+                    <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm">
+                        
+                        {{ d.rating }} ★
+                    
+                    </span>
+                    
+                    <!-- Body -->
+                     
+                    <div class="card-body">
+                        
+                        <h5 class="fw-bold">{{ d.name }}</h5>
+                        
+                        <p class="text-secondary small mb-1">✈ Flight + Hotel</p>
+                        
+                        <p class="fw-bold text-primary">{{ d.price }}</p>
+                        
+                        <div class="d-flex gap-2 mt-2">
+                            
+                            <!-- View Button -->
+                             
+                            <a href="/destination/{{ d.slug }}" 
+                            
+                            class="btn btn-outline-primary btn-sm w-100">
+                            View
+                        </a>
+                        
+                        <!-- Save Button -->
+                         
+                        <button class="btn btn-primary btn-sm w-100 save-trip-btn"
+                                data-title="{{ d.name }}"
+                                data-sub="Flight + Hotel"
+                                data-img="{{ d.image }}">
+                                Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+
+        <!-- My Trips (dynamic) -->
+        <h5 class="mb-3">My Trips</h5>
+        <div class="card mb-5">
+            <div class="card-body">
+                {% if trips %}
+                    <div class="row g-3">
+                        {% for trip in trips %}
+                            <div class="col-12 col-md-6">
+                                <div class="d-flex gap-3 align-items-center">
+                                    <img src="{{ trip.img }}" class="trip-thumb rounded" alt="{{ trip.title }}">
+                                    <div>
+                                        <div class="fw-semibold">{{ trip.title }}</div>
+                                        <div class="small text-secondary">{{ trip.sub }}</div>
+                                    </div>
+                                    <div class="ms-auto text-end">
+                                        <a href="/saved_details/{{ trip.title|lower }}" class="btn btn-outline-primary btn-sm">Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-secondary">You haven't planned any trips yet.</div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Sidebar overlay for mobile -->
+<div id="sidebarOverlay" class="sidebar-overlay d-lg-none"></div>
+
+<!-- small JS for toggling sidebar (keeps template self-contained) -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if(toggle){
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+    }
+    if(overlay){
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+    }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll(".save-trip-btn").forEach(btn => {
+        btn.addEventListener("click", async function () {
+
+            const title = this.dataset.title;
+            const sub = this.dataset.sub;
+            const img = this.dataset.img;
+
+            const response = await fetch("/save-trip", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({
+                    title: title,
+                    sub: sub,
+                    img: img
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+                alert("Saved to Saved Places!");
+            }
+            else if (result.status === "not_logged_in") {
+                alert("Please log in first!");
+            }
+            else {
+                alert("Something went wrong.");
+            }
+        });
+    });
+
+});
+</script>
+
+{% endblock %}
+

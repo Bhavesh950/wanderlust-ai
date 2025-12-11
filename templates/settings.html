@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Settings | Smart Travel Assistant{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-3">
+      <div class="card p-3 mb-3" style="border-radius:12px;">
+        <div class="text-center">
+          <img src="{{ session.get('user_avatar') }}" alt="avatar" class="rounded-circle" width="110" height="110" style="object-fit:cover;">
+          <h5 class="mt-2 mb-0">{{ session.get('user_name') }}</h5>
+          <div class="text-secondary small">{{ session.get('user_email') }}</div>
+        </div>
+        <hr>
+        <div class="list-group">
+          <a href="{{ url_for('profile') }}" class="list-group-item list-group-item-action">Profile</a>
+          <a href="{{ url_for('settings') }}" class="list-group-item list-group-item-action active">Settings</a>
+          <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action text-danger">Log Out</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      <div class="card p-4" style="border-radius:12px;">
+        <h4 class="mb-4">Settings</h4>
+        {% if msg %}
+        <div class="alert alert-info">{{ msg }}</div>
+        {% endif %}
+        <!-- THEME SWITCH -->
+         <div class="d-flex justify-content-between align-items-center p-3 border rounded mb-4">
+          <div>
+            <div class="fw-semibold">Switch Light/Dark Mode</div>
+            <div class="small text-secondary">Choose between light and dark theme.</div>
+          </div>
+          <button id="settingsTheme" class="btn btn-primary">Switch</button>
+        </div>
+
+
+        <!-- CHANGE PASSWORD -->
+         <div class="mb-4">
+          <h6>Change Password</h6>
+          <form method="POST" action="/settings">
+            <input type="hidden" name="action" value="change_password">
+            <div class="p-3 border rounded mb-3">
+              <label class="small">Current Password</label>
+              <input type="password" name="current_password" class="form-control mb-2" required>
+              <label class="small">New Password</label>
+              <input type="password" name="new_password" class="form-control" required>
+              <label class="small">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+            <button class="btn btn-primary">Update Password</button>
+          </form>
+        </div>
+        
+        <!-- DELETE ACCOUNT (same as before) -->
+         <form method="post">
+          <div class="mb-4">
+            <h6>Account Management</h6>
+            <div class="d-flex justify-content-between align-items-center p-3 border rounded">
+              <div>
+                <div class="fw-semibold">Delete Account</div>
+                <div class="small text-secondary">This action will permanently remove your account and data.</div>
+              </div>
+              <button type="submit" name="action" value="delete_account" class="btn btn-outline-danger">Delete</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.getElementById("settingsTheme").addEventListener("click", () => {
+    document.getElementById("themeToggle").click();
+});
+</script>
+
+{% endblock %}
+

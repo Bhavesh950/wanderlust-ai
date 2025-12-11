@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ saved_details.title }} – Details{% endblock %}
+
+{% block content %}
+
+<style>
+    .hero-banner {
+        height: 380px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 22px;
+    }
+    .info-box {
+        border-radius: 18px;
+        background: var(--bs-body-bg);
+        transition: .2s;
+    }
+    .info-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .section-title {
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- HERO IMAGE -->
+    <div class="hero-banner mb-4"
+         style="background-image: url('{{ saved_details.img }}');">
+    </div>
+
+    <!-- TITLE + SAVE BUTTON -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">{{ saved_details.title }}</h2>
+            <p class="text-secondary">{{ saved_details.sub }}</p>
+        </div>
+
+        <button class="btn btn-primary px-4"
+                id="saveDestinationBtn"
+                data-title="{{ saved_details.title }}"
+                data-sub="{{ saved_details.sub }}"
+                data-img="{{ saved_details.img }}">
+            <i class="bi bi-bookmark"></i> Save Place
+        </button>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="info-box shadow-sm p-4 mb-4">
+        <h4 class="section-title"><i class="bi bi-info-circle text-primary"></i> About {{ saved_details.title }}</h4>
+        <p class="text-secondary">
+            {{ saved_details.description }}
+        </p>
+    </div>
+
+    <!-- WEATHER -->
+    <div class="info-box shadow-sm p-4 mb-4">
+        <h4 class="section-title"><i class="bi bi-cloud-sun text-warning"></i> Weather</h4>
+        <p class="text-secondary">Check weather conditions before planning your trip.</p>
+        <a href="/weather" class="btn btn-outline-primary mt-2">Check Weather</a>
+    </div>
+
+    <!-- HOTELS -->
+    <div class="info-box shadow-sm p-4 mb-4">
+        <h4 class="section-title"><i class="bi bi-building text-success"></i> Best Hotels</h4>
+        <p class="text-secondary">Find popular hotels in {{ saved_details.title }}.</p>
+        <a href="/hotel_search" class="btn btn-primary mt-2">Search Hotels</a>
+    </div>
+
+    <!-- FLIGHTS -->
+    <div class="info-box shadow-sm p-4">
+        <h4 class="section-title"><i class="bi bi-airplane text-danger"></i> Flights</h4>
+        <p class="text-secondary">Find flights to {{ saved_details.title }}.</p>
+        <a href="/flights" class="btn btn-outline-primary mt-2">Search Flights</a>
+    </div>
+
+</div>
+
+<script>
+document.getElementById("saveDestinationBtn").addEventListener("click", async function(){
+    const title = this.dataset.title;
+    const sub = this.dataset.sub;
+    const img = this.dataset.img;
+
+    const response = await fetch("/save-trip", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ 
+            title: title,
+            sub: sub,
+            img: img
+        })
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+        alert("Destination saved!");
+    } else {
+        alert("Something went wrong.");
+    }
+});
+</script>
+
+{% endblock %}

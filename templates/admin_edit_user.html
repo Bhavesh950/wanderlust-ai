@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+{% set active = "users" %}
+{% set title = "Edit User" %}
+
+{% block content %}
+
+<!-- ⭐ Center Wrapper -->
+<div class="d-flex justify-content-center">
+    <div class="admin-card p-4 shadow-sm rounded-4" style="max-width:600px; width:100%;">
+
+        <h2 class="admin-title text-center mb-4">Edit User</h2>
+
+        <form method="POST">
+
+            <!-- Name -->
+            <label class="fw-semibold">Name</label>
+            <input class="form-control mb-3" name="name" value="{{ user.name }}" />
+
+            <!-- Email -->
+            <label class="fw-semibold">Email</label>
+            <input class="form-control mb-3" name="email" value="{{ user.email }}" />
+
+            <!-- Phone -->
+            <label class="fw-semibold">Phone</label>
+            <input class="form-control mb-3" name="phone" value="{{ user.phone_number }}" />
+
+            <!-- Admin Checkbox -->
+            <div class="form-check mb-4 mt-2">
+                <input class="form-check-input" type="checkbox" name="is_admin"
+                       {% if user.is_admin %}checked{% endif %}>
+                <label class="form-check-label fw-semibold">
+                    Make Admin
+                </label>
+            </div>
+
+            <!-- Save Button -->
+            <button class="btn btn-primary w-100 py-2">Save</button>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Travel Assistant{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body, html {
+            font-family: 'Roboto', sans-serif !important;
+        }
+        /* FIX EMAIL OVERFLOW */
+        .user-email {
+            font-size: 0.82rem;
+            color: #aaa;
+            word-break: break-word;        /* wraps long email */
+            white-space: normal;
+            max-width: 160px;               /* prevents stretching */
+            line-height: 1.2;
+            display: block;
+        }
+        .profile-dropdown {
+            min-width: 250px !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+     <nav class="navbar navbar-expand-lg sticky-top border-bottom backdrop-blur">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+                <div class="brand-icon rounded-3 text-white d-flex align-items-center justify-content-center">W</div>
+                Wanderlust AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/flights">Flights</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hotels">Hotels</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/weather">Weather</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/map">Map</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/travel-ai">Euri</a></li>
+
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Theme Toggle -->
+                     <button id="themeToggle" class="btn btn-link nav-link p-0" aria-label="Toggle Theme">
+                        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                    </button>
+                     
+                     {% if session.get('user_id') %}
+                     <!-- PROFILE DROPDOWN -->
+                    <div class="nav-profile position-relative">
+                        <!-- Avatar Button -->
+                         <button id="profileBtn" class="btn p-0 border-0 bg-transparent">
+                            <img 
+                            src="{{ session.get('user_avatar') or url_for('static', filename='images/default-avatar.png') }}"
+                            class="nav-avatar">
+                            
+                            
+
+                        </button>
+                        <!-- DROPDOWN -->
+                        <div id="profileDropdown" class="profile-dropdown shadow-sm">
+                            <!-- TOP USER SECTION -->
+                            <div class="profile-head d-flex gap-3 align-items-center p-3">
+                                <img 
+                                src="{{ session.get('user_avatar') or url_for('static', filename='images/default-avatar.png') }}"
+                                class="dropdown-avatar">
+                                
+                                
+
+
+                                <div>
+                                    <div class="fw-semibold">{{ session.get('user_name') }}</div>
+                                    <div class="small text-secondary user-email">{{ session.get('user_email') }}</div>
+
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <a href="/profile" class="dropdown-link mb-2">
+                                    <i class="bi bi-person"></i> Manage Account
+                                </a>
+                                <a href="/my-trips" class="dropdown-link mb-2">
+                                    <i class="bi bi-briefcase"></i> My Trips
+                                </a>
+                                
+                                <a href="/saved-trips" class="dropdown-link mb-2">
+                                    <i class="bi bi-bookmarks"></i> Saved Places
+                                </a>
+                                
+                                <a href="/dashboard" class="dropdown-link mb-2">
+                                    <i class="bi bi-speedometer"></i> Dashboard
+                                </a>
+                        
+                                <a href="/settings" class="dropdown-link mb-2">
+                                    <i class="bi bi-gear"></i> Settings
+                                </a>
+                                <div class="dropdown-divider my-2"></div>
+                                <a href="/logout" class="text-danger fw-medium d-block">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- LOGGED OUT BUTTONS -->
+                     <div class="d-none d-lg-flex gap-2">
+                        <a href="/login" class="btn btn-outline-primary btn-sm">Login</a>
+                        <a href="/signup" class="btn btn-primary btn-sm text-white">Sign Up</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top py-5 mt-5 bg-body-tertiary">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="fw-bold mb-3">Wanderlust AI</h5>
+                    <p class="text-secondary small">Where smart travel begins — plan your next trip with AI for smarter routes, better trips, and unforgettable memories.</p>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-uppercase fw-bold mb-3 small text-primary">Explore</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="/flights" class="text-decoration-none text-secondary">Flights</a></li>
+                        <li class="mb-2"><a href="/hotels" class="text-decoration-none text-secondary">Hotels</a></li>
+                        <li class="mb-2"><a href="/map" class="text-decoration-none text-secondary">Map</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-uppercase fw-bold mb-3 small text-primary">Account</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="/dashboard" class="text-decoration-none text-secondary">Dashboard</a></li>
+                        <li class="mb-2"><a href="/saved-trips" class="text-decoration-none text-secondary">Saved Trips</a></li>
+                        <li class="mb-2"><a href="/admin" class="text-decoration-none text-secondary">Admin</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="text-uppercase fw-bold mb-3 small text-primary">Follow Us</h6>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-secondary fs-5"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-secondary fs-5"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="text-secondary fs-5"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-4 mt-4 border-top">
+                <p class="small text-secondary mb-0">Designed for dreamers Built for explorers & guiding every step of your adventure because wanderlust begins with a single click.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const themeSwitch = document.getElementById("themeSwitch");
+            const htmlTag = document.documentElement;
+            // Set theme on load
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme) {
+                htmlTag.setAttribute("data-bs-theme", savedTheme);
+            }
+            
+            // Button click
+            if (themeSwitch) {
+                themeSwitch.addEventListener("click", () => {
+                    const current = htmlTag.getAttribute("data-bs-theme") || "light";
+                    const newTheme = current === "light" ? "dark" : "light";
+                    htmlTag.setAttribute("data-bs-theme", newTheme);
+                    localStorage.setItem("theme", newTheme);
+                });
+            }
+        });
+    </script>
+    <!-- Theme Toggle JS -->
+    <script src="{{ url_for('static', filename='js/theme_toggle.js') }}"></script>
+    <!-- Chart.js and admin charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/admin_charts.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const profileBtn = document.getElementById('profileBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if(profileBtn){
+                profileBtn.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    profileDropdown.classList.toggle('show');
+                });
+            }
+            
+            document.addEventListener('click', function(e){
+                if(profileDropdown && !profileBtn.contains(e.target)){
+                    profileDropdown.classList.remove('show');
+                }
+            });
+            
+            document.addEventListener('keydown', function(e){
+                if(e.key === "Escape"){
+                    profileDropdown.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
+
+    <!-- ============================================================== -->
+     <!--           AI ASSISTANT ONLY ON HOME PAGE (NEW UI)              -->
+    <!-- ============================================================== -->
+     
+    {% if request.path == '/' %}
+    
+    <style>
+        /* Floating Bubble Button */
+        #ai-bubble {
+            
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 2000;
+            transition: 0.2s;
+        }
+        #ai-bubble:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Chat Popup Box */
+        #ai-chatbox {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: 360px;
+            height: 480px;
+            background: white;
+            border-radius: 22px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 3000;
+        }
+        
+        /* Header Area */
+        #ai-header {
+            background: linear-gradient(135deg, #7293ed, #ce54aa);
+            padding: 12px 15px;
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+        }
+        #ai-header img {
+            width: 60px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+            100% { transform: translateY(0); }
+        }
+        #ai-close-btn {
+            background: rgb(179, 61, 140);
+            border: none;
+            font-size: 18px;
+            padding: 6px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* Messages Box */
+        #ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #b15b97;
+        }
+        
+        /* Input Area */
+        #ai-input-area {
+            padding: 10px;
+            background: #f1f2f6;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #ai-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+        }
+        
+        #ai-send-btn {
+            padding: 10px 14px;
+            background: #0d6efd;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+        }
+        #ai-bot-img {
+            width: 65px;
+            height: 65px;
+            border-radius:50%;
+            object-fit: cover;
+        
+        
+        /* User bubble */
+        .user-msg {
+            background: #d6e7ff;
+            color: #000;
+        }
+        
+        /* Bot bubble */
+        .bot-msg {
+            background: #f0d4ff;
+            color: #333;
+        }
+    }
+
+    </style>
+    
+    <!-- Floating AI Bubble -->
+     <div id="ai-bubble">
+        <img src="{{ url_for('static', filename='images/search.gif') }}" 
+        style="width:65px; height:65px; border-radius:50%; object-fit:cover;">
+    </div>
+
+     
+     <!-- AI Chat Popup -->
+      <div id="ai-chatbox">
+        <div id="ai-header">
+             <img src="{{ url_for('static', filename='images/bot.gif') }}" id="ai-bot-img">
+            <button id="ai-close-btn">✖</button>
+        </div>
+        <div id="ai-messages"></div>
+        
+        <div id="ai-input-area">
+            <input id="ai-input" type="text" placeholder="What are you looking for?" />
+            <button id="ai-send-btn">➤</button>
+        </div>
+    </div>
+    
+    <script>
+
+        let homeConversationId = null;
+        
+        // Create conversation when chat opens
+        async function startHomeConversation() {
+            const res = await fetch("/api/start_chat", {
+                method: "POST"
+            });
+            const data = await res.json();
+            homeConversationId = data.conversation_id;
+        }
+
+
+        const bubble = document.getElementById("ai-bubble");
+        const chatbox = document.getElementById("ai-chatbox");
+        const closeBtn = document.getElementById("ai-close-btn");
+        const sendBtn = document.getElementById("ai-send-btn");
+        const input = document.getElementById("ai-input");
+        const messages = document.getElementById("ai-messages");
+
+        // Euri greeting when chat opens
+        function showWelcomeMessage() {
+            addMessage("Hello! I'm Euri, your personal travel assistant. How can I help plan your next journey?", "bot");
+        }
+        
+        // Open chat
+        bubble.onclick = async() => {
+            chatbox.style.display = "flex";
+            messages.innerHTML = "";          // clear old messages
+            
+            await startHomeConversation();  // <-- important!
+            showWelcomeMessage();             // show greeting
+            };
+        
+        // Close chat
+        
+        closeBtn.onclick = () => {
+            chatbox.style.display = "none";
+        };
+        
+        // Send message
+        sendBtn.onclick = sendMessage;
+        input.addEventListener("keypress", e => {
+            if (e.key === "Enter") sendMessage();
+        });
+        
+        async function sendMessage() {
+            let text = input.value.trim();
+            if (!text) return;
+            
+            addMessage(text, "user");
+            
+            input.value = "";
+            
+            // Ensure conversation ID exists
+            
+            if (!homeConversationId) {
+                await startHomeConversation();
+            }
+            
+            const res = await fetch("/api/assistant", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: text,
+                    conversation_id: homeConversationId
+                })
+            });
+            
+            const data = await res.json();
+            
+            addMessage(data.reply, "bot");
+        }
+
+        
+        function addMessage(text, sender) {
+            let div = document.createElement("div");
+            div.style.margin = "10px";
+            div.style.padding = "10px 14px";
+            div.style.borderRadius = "14px";
+            div.style.maxWidth = "75%";
+            
+            if (sender === "user") {
+                div.style.classList = "user-msg";
+                div.style.marginLeft = "auto";
+            
+            } else {
+                div.style.classList = "bot-msg";
+            }
+            
+            div.textContent = text;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+    
+    {% endif %}
+    <!-- END AI HOME PAGE CONDITION -->
+
+</body>
+</html>

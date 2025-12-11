@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Wanderlust AI{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section position-relative d-flex align-items-center justify-content-center text-white overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50 z-1"></div>
+    <img src="https://picsum.photos/1920/1080?random=10" alt="Hero" class="position-absolute w-100 h-100 object-fit-cover">
+    
+    <div class="container position-relative z-2 text-center">
+        <h1 class="display-4 fw-bold mb-4">Discover Your Next Adventure</h1>
+        <p class="lead mb-5 opacity-90">Plan your perfect trip with our AI-powered travel assistant.</p>
+        
+        <div class="card border-0 shadow-lg p-2 rounded-4 mx-auto" style="max-width: 800px;">
+            <div class="card-body">
+                <form class="row g-2" onsubmit="return false;">
+                    <div class="col-md-8">
+                         <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-geo-alt text-primary"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Where do you want to go?">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <button type="button" id="exploreBtn" class="btn btn-primary btn-lg w-100 fw-semibold text-white">
+                            <i class="bi bi-search me-2"></i> Explor
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trending Destinations -->
+<section class="py-5">
+    <div class="container py-4">
+        
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Trending Destinations</h2>
+                <p class="text-secondary mb-0">Most popular places tailored for you.</p>
+            </div>
+            <a href="/trending" class="text-decoration-none fw-medium">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- CARD 1 - KYOTO -->
+            <div class="col-sm-6 col-lg-3">
+                <a href="/destination/kyoto" class="text-decoration-none text-white">
+                    <div class="card h-100 border-0 shadow-sm hover-card overflow-hidden rounded-4">
+                        <div class="position-relative">
+                            <img src="https://picsum.photos/800/600?random=11" class="card-img-top" alt="Kyoto">
+                            <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm">4.8 <i class="bi bi-star-fill text-warning"></i></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="trend-title fw-bold text-white">Kyoto, Japan</h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-secondary"><i class="bi bi-airplane"></i> Flight + Hotel</small>
+                                <span class="trend-price fw-bold">₹12,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- CARD 2 - SANTORINI -->
+            <div class="col-sm-6 col-lg-3">
+                <a href="/destination/santorini" class="text-decoration-none text-white">
+                    <div class="card h-100 border-0 shadow-sm hover-card overflow-hidden rounded-4">
+                        <div class="position-relative">
+                            <img src="https://picsum.photos/800/600?random=12" class="card-img-top" alt="Santorini">
+                            <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm">4.9 <i class="bi bi-star-fill text-warning"></i></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="trend-title fw-bold text-white">Santorini, Greece</h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-secondary"><i class="bi bi-airplane"></i> Flight + Hotel</small>
+                                <span class="trend-price fw-bold">₹18,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- CARD 3 - BALI -->  
+            <div class="col-sm-6 col-lg-3">
+                <a href="/destination/bali" class="text-decoration-none text-white">
+                    <div class="card h-100 border-0 shadow-sm hover-card overflow-hidden rounded-4">
+                        <div class="position-relative">
+                            <img src="https://picsum.photos/800/600?random=13" class="card-img-top" alt="Bali">
+                            <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm">4.7 <i class="bi bi-star-fill text-warning"></i></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="trend-title fw-bold text-white">Bali, Indonesia</h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-secondary"><i class="bi bi-airplane"></i> Flight + Hotel</small>
+                                <span class="trend-price fw-bold">₹95,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- CARD 4 - REYKJAVIK -->
+            <div class="col-sm-6 col-lg-3">
+                <a href="/destination/reykjavik" class="text-decoration-none text-white">
+                    <div class="card h-100 border-0 shadow-sm hover-card overflow-hidden rounded-4">
+                        <div class="position-relative">
+                            <img src="https://picsum.photos/800/600?random=14" class="card-img-top" alt="Reykjavik">
+                            <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm">4.9 <i class="bi bi-star-fill text-warning"></i></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="trend-title fw-bold text-white">Reykjavik, Iceland</h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-secondary"><i class="bi bi-airplane"></i> Flight + Hotel</small>
+                                <span class="trend-price fw-bold">₹14,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<style>
+.hover-card {
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+.hover-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+</style>
+
+<!-- Features -->
+<section class="py-5 bg-body-tertiary">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Why Wanderlust AI?</h2>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 bg-body rounded-4 shadow-sm h-100">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-search fs-3"></i>
+                    </div>
+                    <h4>Smart Search</h4>
+                    <p class="text-secondary">Find the best routes and hidden deals with our intelligent search engine.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-body rounded-4 shadow-sm h-100">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-calendar-check fs-3"></i>
+                    </div>
+                    <h4>Easy Planning</h4>
+                    <p class="text-secondary">Organize your itinerary, flights, and hotels in one simple dashboard.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-body rounded-4 shadow-sm h-100">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-info-subtle text-info rounded-circle mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-geo-alt fs-3"></i>
+                    </div>
+                    <h4>Local Insights</h4>
+                    <p class="text-secondary">Get real-time weather updates and recommendations for local attractions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.getElementById("exploreBtn").addEventListener("click", function () {
+    let place = document.getElementById("searchInput").value.trim();
+
+    if (!place) {
+        alert("Please enter a destination!");
+        return;
+    }
+
+    place = encodeURIComponent(place);  // Encode spaces etc.
+
+    window.location.href = "/destination/" + place; 
+});
+</script>
+
+
+{% endblock %}

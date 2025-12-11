@@ -1,0 +1,23 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+
+<h2 class="mb-4">Admin Settings</h2>
+
+<div class="admin-card">
+
+<form method="POST">
+
+    <label>Email</label>
+    <input class="form-control mb-3" name="email" value="{{ admin.email }}">
+
+    <label>New Password</label>
+    <input class="form-control mb-3" type="password" name="password" placeholder="Enter new password">
+
+    <button class="btn btn-primary w-100">Save Changes</button>
+
+</form>
+
+</div>
+
+{% endblock %}

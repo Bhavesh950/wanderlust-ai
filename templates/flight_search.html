@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Search Flights - Wanderlust AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h4 class="fw-bold mb-3">✈ Search Flights</h4>
+
+        <form method="POST" class="row g-3" onsubmit="showLoader()">
+
+            <!-- FROM -->
+            <div class="col-md-4 position-relative">
+                <label class="form-label small text-secondary">From</label>
+                <input type="text" id="fromInput" name="from_input" class="form-control" autocomplete="off"
+                       placeholder="City or IATA code (BOM, DEL, LAX)">
+                <input type="hidden" name="from_sky" id="fromSky">
+                <ul id="fromList" class="list-group position-absolute w-100"></ul>
+            </div>
+
+            <!-- TO -->
+            <div class="col-md-4 position-relative">
+                <label class="form-label small text-secondary">To</label>
+                <input type="text" id="toInput" name="to_input" class="form-control" autocomplete="off"
+                       placeholder="City or IATA code (BOM, DEL, LAX)">
+                <input type="hidden" name="to_sky" id="toSky">
+                <ul id="toList" class="list-group position-absolute w-100"></ul>
+            </div>
+
+            <!-- TRIP TYPE SWITCH -->
+            <div class="col-md-4">
+                <label class="form-label small text-secondary d-block">Trip Type</label>
+
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="tripToggle" name="trip_type" value="roundtrip">
+                    <label class="form-check-label" id="tripLabel" for="tripToggle">One-way</label>
+                </div>
+            </div>
+
+            <!-- DEPART DATE -->
+            <div class="col-md-3">
+                <label class="form-label small text-secondary">Departure Date</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+
+            <!-- RETURN DATE -->
+            <div class="col-md-3" id="returnCol" style="display:none;">
+                <label class="form-label small text-secondary">Return Date</label>
+                <input type="date" name="return_date" class="form-control">
+            </div>
+
+            <!-- CLASS -->
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">Class</label>
+                <select name="cabin" class="form-select">
+                    <option value="economy">Economy</option>
+                    <option value="premium">Premium</option>
+                    <option value="business">Business</option>
+                </select>
+            </div>
+
+            <!-- ADULTS -->
+            <div class="col-md-2">
+                <label class="form-label small text-secondary">Adults</label>
+                <input type="number" name="adults" min="1" value="1" class="form-control">
+            </div>
+
+            <div class="col-md-12 text-end">
+                <button class="btn btn-primary" type="submit">Search Flights</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div id="loader" class="text-center d-none">
+        <div class="spinner-border"></div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-warning">{{ error }}</div>
+    {% endif %}
+
+    {% if flights %}
+    <div class="row g-3">
+        {% for f in flights %}
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="fw-bold mb-1">{{ f.airline }}</h6>
+                        <div>{{ f.departureTime }} → {{ f.arrivalTime }}</div>
+                        <div>Duration: {{ f.duration }}</div>
+                        <div>Stops: {{ f.stops }}</div>
+                    </div>
+
+                    <div class="text-end">
+                        <h5 class="fw-bold text-primary">{{ f.price }}</h5>
+                    </div>
+                </div>
+
+                {% if f.link %}
+                <a href="{{ f.link }}" target="_blank" class="btn btn-primary btn-sm mt-3">
+                    ✈ Book Flight
+                </a>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+/* Trip toggle */
+const tripToggle = document.getElementById("tripToggle");
+const tripLabel = document.getElementById("tripLabel");
+const returnCol = document.getElementById("returnCol");
+
+tripToggle.addEventListener("change", () => {
+    if (tripToggle.checked) {
+        tripLabel.innerText = "Round-trip";
+        returnCol.style.display = "block";
+    } else {
+        tripLabel.innerText = "One-way";
+        returnCol.style.display = "none";
+    }
+});
+
+/* Auto-complete function */
+function autoFill(inputId, listId, hiddenId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    const hidden = document.getElementById(hiddenId);
+
+    let timer;
+
+    input.addEventListener("input", () => {
+        const q = input.value.trim();
+        list.innerHTML = "";
+        hidden.value = "";
+
+        if (!q) return;
+
+        // Direct IATA entry (BOM, DEL…)
+        if (/^[A-Za-z]{3}$/.test(q)) {
+            hidden.value = q.toUpperCase();
+            return;
+        }
+
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            const res = await fetch(`/search-airport?q=${q}`);
+            const data = await res.json();
+            list.innerHTML = "";
+
+            data.slice(0, 6).forEach(a => {
+                const li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.innerText = `${a.name}, ${a.city} (${a.id})`;
+                li.onclick = () => {
+                    input.value = `${a.name} (${a.id})`;
+                    hidden.value = a.id;
+                    list.innerHTML = "";
+                };
+                list.appendChild(li);
+            });
+
+        }, 300);
+    });
+}
+
+autoFill("fromInput", "fromList", "fromSky");
+autoFill("toInput", "toList", "toSky");
+
+function showLoader() {
+    document.getElementById("loader").classList.remove("d-none");
+}
+</script>
+
+{% endblock %}

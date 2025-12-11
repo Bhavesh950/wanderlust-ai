@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Search Hotels - Wanderlust AI{% endblock %}
+
+{% block content %}
+
+<style>
+/* ⭐ FIX RATING BADGE INVISIBLE IN DARK MODE */
+.rating-badge {
+    background: #fff !important;      /* keep white badge */
+    color: #000 !important;           /* black text always */
+    border-radius: 8px;
+    font-weight: 700;
+    padding: 3px 8px;
+}
+
+/* ⭐ CARD HOVER ANIMATION */
+.hotel-card {
+    transition: all 0.25s ease;
+}
+
+.hotel-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* Make all hotel cards equal height */
+.hotel-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content area grows automatically */
+.hotel-card-body {
+    flex-grow: 1;
+}
+
+/* Fix View Details button position */
+.hotel-btn-wrapper {
+    margin-top: auto; 
+}
+
+</style>
+
+<div class="container py-5">
+
+    <!-- Search Box -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4">
+
+            <h4 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                <i class="bi bi-buildings text-primary"></i> Search Hotels
+            </h4>
+
+            <!-- ⭐ FORM STARTS HERE -->
+            <form action="/hotels" method="POST" class="row g-3">
+
+                <div class="col-md-5">
+                    <label class="form-label small text-secondary fw-semibold">Destination</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-geo-alt"></i></span>
+                        <input type="text" name="city" class="form-control" placeholder="Paris" required>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label small text-secondary fw-semibold">Check-in</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-calendar"></i></span>
+                        <input type="date" name="checkin" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label small text-secondary fw-semibold">Check-out</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i class="bi bi-calendar"></i></span>
+                        <input type="date" name="checkout" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 fw-medium text-white">
+                        <i class="bi bi-search"></i> Find
+                    </button>
+                </div>
+
+            </form>
+            <!-- ⭐ FORM ENDS HERE -->
+
+        </div>
+    </div>
+
+    <!-- 🔥 HOTEL RESULTS -->
+    {% if hotels %}
+    <h4 class="fw-bold mt-5 mb-3">Hotels Found in {{ city }}</h4>
+
+    <div class="row g-4 mt-2">
+        {% for h in hotels %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hotel-card">
+                <div class="position-relative" style="height:200px;">
+                    <img src="{{ h.image or '/static/images/no-hotel.jpg' }}" class="w-100 h-100 object-fit-cover">
+                    <div class="position-absolute top-0 end-0 m-3 rating-badge shadow">
+                        ⭐ {{ h.rating  or "N/A"}}
+                    </div>
+                </div>
+
+                <div class="card-body p-4 hotel-card-body">
+                    
+                    <h5 class="fw-bold">{{ h.name }}</h5>
+                    <p class="text-secondary small mb-2">
+                        
+                        <i class="bi bi-geo-alt"></i> {{ h.address }}
+                    </p>
+                    
+                    <!-- PRICE -->
+                     
+                    <div class="pt-3 mt-3 border-top">
+                        <span class="h4 fw-bold text-primary">₹{{ h.price | round(0) }}</span>
+                        <span class="small text-secondary">/ night</span>
+                    </div>
+                    <!-- BUTTON ALWAYS AT BOTTOM -->
+                     <div class="hotel-btn-wrapper mt-3">
+                        <a href="/hotel/{{ h.detail_id }}?checkin={{ checkin }}&checkout={{ checkout }}"
+                        class="btn btn-primary w-100 fw-semibold py-2">
+                         View Details
+                        </a>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
