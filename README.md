@@ -177,7 +177,8 @@ wanderlust-ai/
 │       └── dashboard.png
 │
 └── refresh.txt                 # Notes / temp file
-```
+``` 
+
 
 # 📸 Project Screenshots
 
