@@ -121,14 +121,17 @@ It helps users explore destinations search hotels & flights check weather explor
 
 # 📁 Project Structure
 
-Wanderlust-AI/
+```text
+wanderlust-ai/
 │
-├── app.py                  # Main Flask application
-├── requirements.txt        # Python dependencies
-├── database.sql            # Database schema
-├── .gitignore              # Git ignore rules
+├── app.py                      # Main Flask application
+├── requirements.txt            # Python dependencies
+├── database.sql                # Database schema
+├── .env                        # Environment variables (ignored)
+├── .gitignore                  # Git ignore rules
+├── README.md                   # Project documentation
 │
-├── templates/              # HTML templates
+├── templates/                  # HTML templates (Jinja2)
 │   ├── home.html
 │   ├── travel_ai.html
 │   ├── hotel_search.html
@@ -141,22 +144,40 @@ Wanderlust-AI/
 │   ├── dashboard.html
 │   ├── profile.html
 │   │
-│   └── admin/              # Admin panel pages
+│   └── admin/                  # Admin panel templates
 │       ├── admin.html
 │       ├── admin_users.html
 │       ├── admin_edit_user.html
 │       ├── admin_logs.html
 │       └── admin_settings.html
 │
-├── static/                 # Static assets
+├── static/                     # Static assets
 │   ├── css/
-│   ├── js/
-│   ├── uploads/            # User profile photos
-│   ├── images/             # Destination images
-│   └── weather-icons/
+│   │   └── style.css
+│   │
+│   ├── js/                     # JavaScript files
+│   │   └── theme_toggle.js
+│   │
+│   ├── images/                 # UI & destination images
+│   │   ├── bot.gif
+│   │   ├── default-avatar.png
+│   │   ├── hotels/
+│   │   └── destinations/
+│   │
+│   ├── uploads/                # User uploaded profile images
+│   │   └── default-avatar.png
+│   │
+│   ├── weather-icons/          # Weather condition icons
+│   │
+│   └── readme/                 # README screenshots
+│       ├── home_page.png
+│       ├── flights.png
+│       ├── hotels.png
+│       ├── weather.png
+│       └── dashboard.png
 │
-└── README.md
-
+└── refresh.txt                 # Notes / temp file
+```
 
 # 📸 Project Screenshots
 
