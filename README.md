@@ -1,4 +1,3 @@
-.
 # 🖼️ Wanderlust AI  
 
 ![Wanderlust AI Banner](static/readme/banner.png)
@@ -157,6 +156,7 @@ Wanderlust-AI/
 │   └── weather-icons/
 │
 └── README.md
+
 
 # 📸 Project Screenshots
 
