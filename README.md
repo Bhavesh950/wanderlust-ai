@@ -124,12 +124,12 @@ It helps users explore destinations search hotels & flights check weather explor
 
 Wanderlust-AI/
 │
-├── app.py                     # Main Flask application
-├── requirements.txt           # Dependencies
-├── .gitignore
-├── database.SQL
+├── app.py                  # Main Flask application
+├── requirements.txt        # Python dependencies
+├── database.sql            # Database schema
+├── .gitignore              # Git ignore rules
 │
-├── templates/                 # All HTML pages
+├── templates/              # HTML templates
 │   ├── home.html
 │   ├── travel_ai.html
 │   ├── hotel_search.html
@@ -141,20 +141,20 @@ Wanderlust-AI/
 │   ├── weather.html
 │   ├── dashboard.html
 │   ├── profile.html
-│   ├── ...
-│   ├── admin/                 # Admin pages
+│   │
+│   └── admin/              # Admin panel pages
 │       ├── admin.html
 │       ├── admin_users.html
 │       ├── admin_edit_user.html
 │       ├── admin_logs.html
-│       ├── admin_settings.html
+│       └── admin_settings.html
 │
-├── static/
+├── static/                 # Static assets
 │   ├── css/
 │   ├── js/
-│   ├── uploads/               # Profile photos
-│   ├── images/                # Destination photos
-│   ├── weather-icons/
+│   ├── uploads/            # User profile photos
+│   ├── images/             # Destination images
+│   └── weather-icons/
 │
 └── README.md
 
