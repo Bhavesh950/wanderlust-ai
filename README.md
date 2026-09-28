@@ -1,5 +1,3 @@
-# 🖼️ Wanderlust AI  
-
 <p align="center">
   <img src="static/readme/wanderlust-ai-banner.png" alt="Wanderlust AI Banner" width="100%">
 </p>
