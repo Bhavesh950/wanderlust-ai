@@ -1,6 +1,6 @@
 # 🖼️ Wanderlust AI  
 
-![Wanderlust AI Banner](static/readme/Wanderlust AI banner_3.png)
+![Wanderlust AI Banner](static/readme/Wanderlust AI banner_3.png) 
 
 # 🌍 Wanderlust AI – Intelligent Travel, Flights & Hotel Assistant
 
